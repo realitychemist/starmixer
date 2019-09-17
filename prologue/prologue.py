@@ -72,7 +72,15 @@ for m in masses:
 plt.yscale("log")
 plt.xscale("log")
 plt.plot(masses_renorm, mass_cdf, 'o', color="black")
+plt.savefig("cdf_test.png")
+plt.close()
 
 # This is our mass CDF (numerical)
 # We would prefer to have a PDF, which could then be passed to random.choices
 # See: https://stackoverflow.com/questions/4265988/generate-random-numbers-with-a-given-numerical-distribution
+
+# See: https://arxiv.org/pdf/1212.0939.pdf
+# This source shows several IMFs as PDFs (normalized so full integral is 1)
+# Their L3 IMF looks very promising and much more computationally tractable
+# pl3(m) = A(m/mu)^-alpha * (1+(m/mu)^(1-alpha))^-beta
+# alpha = 2.3, beta = 1.4, mu = 0.2, A depends on integration limits
