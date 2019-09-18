@@ -19,13 +19,8 @@ class Protostar(Star):
     pass
 
 # A pre-main-sequence star is older than a protostar, but still young (<20 MY)
-# These stars should have mass between 0.08 and 8 MSun
+# These stars should have mass between 0.08 and 10 MSun
 class Pre_Main_Sequence(Star):
-    pass
-
-# A class for massive young stars (>8 MSun, <0.1 MY)
-# See: https://astronomy.stackexchange.com/questions/156/how-long-does-it-take-to-produce-a-star-why-does-it-take-that-long
-class Pre_Massive(Star):
     pass
 
 # Brown dwarves form from protostars which accreted less than 0.08 MSun
