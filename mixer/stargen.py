@@ -11,12 +11,34 @@ class Star:
         self.mass = mass
         self.age = age
 
+# Following are subclasses of Star
+# Each one should have: radius
+#                       temperature
+#                       luminosity
+#                       color
+
+
 # Protostars are young stars of any size
 # Protostar objects should be created for stars between 0 and 0.5 MY old
 # See: https://arxiv.org/pdf/1401.1809.pdf
-# Protostars should not have planets, but should have accretion disks and dust/gas envelopes
+# Protostars should not have planets, but may have accretion disks and envelopes
+# See: https://astronomy.stackexchange.com/questions/764/timescale-of-ignition-of-a-protostar
 class Protostar(Star):
-    pass
+    assert self.age >= 0 and self.age <= 0.5, "Incorrect age for a protostar."
+    # Critical Jeans radius assumes T=20K, particle mass=3.9e-24
+    # Using the Jeans radius as initial radius at age = 0 MY
+    jeans_radius = ((scipy.G*self.mass*3.9e-24*1.989e+30)
+                    / (scipy.k*20))
+    # Final radius is equal to BD/PMS/MMS radius (continuity)
+    if self.mass < 0.08: # Brown dwarf continuity condition
+        final_radius = 0 # FIX
+    elif self.mass < 1: # Lower mass main sequence continuity
+        final_radius = slef.mass**0.8
+    else: # Higher mass main sequence continuity; includes M=1 -> R=1
+        final_radius = self.mass**0.57
+
+    # Radius is based on collapse from Jeans radius to final Radius
+    # Collapse happens over protostar lifetime (itself a function of mass)
 
 # A pre-main-sequence star is older than a protostar, but still young (<20 MY)
 # These stars should have mass between 0.08 and 10 MSun
@@ -31,6 +53,7 @@ class BrownDwarf(Star):
 
 # Masses between 0.08 MSun and 0.6 MSun
 # No upper limit on age, should be at least 20 MY old
+# See: http://personal.psu.edu/rbc3/A534/lec18.pdf
 class Low_Mass_Main_Sequence(Star):
     pass
 
