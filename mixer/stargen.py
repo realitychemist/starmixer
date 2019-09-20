@@ -36,9 +36,13 @@ class Protostar(Star):
         final_radius = slef.mass**0.8
     else: # Higher mass main sequence continuity; includes M=1 -> R=1
         final_radius = self.mass**0.57
-
     # Radius is based on collapse from Jeans radius to final Radius
     # Collapse happens over protostar lifetime (itself a function of mass)
+    # See: http://www.astro.uu.se/~hoefner/astro/teach/apd_files/apd_collapse.pdf
+    jeans_density = self.mass / ((4/3)*math.pi*jeans_radius**3)
+    freefall_time = (3*math.pi/(32*scipy.G*jeans_density))**(1/2) # !FIX UNITS!
+    # Note: The following is just a linear interpolation, not physically accurate
+    
 
 # A pre-main-sequence star is older than a protostar, but still young (<20 MY)
 # These stars should have mass between 0.08 and 10 MSun
