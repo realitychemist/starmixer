@@ -102,14 +102,14 @@ class Star:
             metalConstants.update({"b'3" : max(-0.1451, np.polyval([-0.254, -1.5175, -2.2794], self.logMetallicity))})
             # b3 gets updated twice sequentially (depending on metallicity)
             metalConstants.update({"b3" : 10**metalConstants["b'3"]})
-            if(self.metallicity > 0.004:):
+            if(self.metallicity > 0.004):
                 metalConstants.update({"b3" : max(metalConstants["b3"], 0.7307 + 14265.1*self.metallicity**3.395)})
             metalConstants.update({"b4" : metalConstants["b4"] + 0.1231572*self.relativeMetallicity**5})
-            metalConstants.update({"b6"} : metalConstants["b6"] + 0.01640687*self.metallicity**5)
+            metalConstants.update({"b6" : metalConstants["b6"] + 0.01640687*self.metallicity**5})
             metalConstants.update({"b11" : metalConstants["b'11"]**2})
             metalConstants.update({"b13" : metalConstants["b'13"]**2})
-            metalConstants.update({"b14" : metalConstants["b'14"]**metalConstants["b'15"]})
-            metalConstants.update({"b16" : metalConstants["b'16"]**metalConstants["b'15"]})
+            metalConstants.update({"b14" : metalConstants["b'14"]**metalConstants["b15"]})
+            metalConstants.update({"b16" : metalConstants["b'16"]**metalConstants["b15"]})
             if(self.relativeMetallicity > -1.0):
                 metalConstants.update({"b17" : 1.0})
             else:
