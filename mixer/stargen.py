@@ -28,7 +28,6 @@ class Star:
         # mass    : Mass of star (in Msun)
         # age     : Age of star beyond ZAMS (in Myr)
         # metal   : Metallicity of star (as non-H/He fraction)
-        # time_MS : Total time (in Myr) that star will spend / has spent on the main sequence
 
         self.mass = mass
         assert self.mass >= 0.01 and self.mass <= 150, "Stellar mass outside calibrated range!"
@@ -54,7 +53,13 @@ class Star:
         t_mu = max(0.5, 1.0 - 0.01*max(metal_const["a6"] / self.mass**metal_const["a7"],
                                         metal_const["a8"] + metal_const["a9"] / self.mass**metal_const["a10"]))
         time_hook = t_mu * time_BGB
-        self.time_MS = max(time_hook, t_x*time_BGB)
+        time_MS = max(time_hook, t_x*time_BGB)
+
+        # TODO: find a better place for this comment
+        # ZAMS radius and luminosity are due to "Zero-age main-sequence radii and luminosities
+        #  as analytic functions of mass and metallicity" by Tout, Eggleton, and Han (1996)
+        # See: https://academic.oup.com/mnras/article/281/1/257/1066409
+
 
     # Set the lifepath metallicity constants
     # TODO: Come back and finish these!
