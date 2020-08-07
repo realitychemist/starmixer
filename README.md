@@ -5,7 +5,7 @@ This is extremely early version software.  The goal of this software is to be ab
 
 ## (Planned) Features
 ### Random Generation
-Quickly generate a system completely unique star system in a way that respects plausibility.  No stars will have planets inside the Roche limit (and likewise for planets and their moons), and most stars will be fairly small.  Of course, some assumptions need to be made about some statistical distributions, but as far as possible random generation will be based on a plausible guess about the makeup of the actual universe.
+Quickly generate a completely unique star system in a way that respects plausibility.  No stars will have planets inside the Roche limit (and likewise for planets and their moons), and most stars will be fairly small.  Of course, some assumptions need to be made about some statistical distributions, but as far as possible random generation will be based on a plausible guess about the makeup of the actual universe.
 
 ### Guided Generation
 Maybe you don't want to randomly generate a star system that is likely to be typical!  Maybe you would prefer to generate systems that contain likely-habitable planets.  Maybe you want a system that has planets orbiting around a black hole.  Whatever cool sci-fi story you have planned, guided generation will help you create systems that fit your constraints but remain plausible in other ways.
