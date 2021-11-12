@@ -13,24 +13,37 @@ class MainSequence(Star):
     # Most stars are main sequence stars (this class includes red dwarfs)
     pass
 
-class Subgiant(Star):
-    # A star
+class Giant(Star):
+    # A star past the main sequence part of its life (or that skipped it)
     pass
 
-class Giant(Star):
+class WolfRayet(Giant):
+    # A peculiar type of giant characterized by extremely high temperature and strong stellar wind
     pass
 
 # %% -=- Stellar Remnants -=- %% #
 class Remnant(CelestialBody):
+    # The remains of a body that was once a star
     pass
 
 class WhiteDwarf(Remnant):
+    # A relatively cool stellar remnant, usually of fairly low mass
     pass
 
 class Neutron(Remnant):
+    # The remnants of a massive star that has undergone a supernova
     pass
 
-class NovaRemnant(Remnant):
+class Pulsar(WhiteDwarf, Neutron):
+    # A neutron star (sometimes a white dwarf) that projects energetic beams from its poles
+    pass
+
+class Magnetar(Neutron):
+    # A type of nuetron star with a strong magnetic field that periodically bursts with radiation
+    pass
+
+class BlackHole(Remnant):
+    # The remnant of a massize star (usually), from which no light can escape
     pass
 
 # %% -=- Non-Stellar Objects -=- %% #
@@ -67,40 +80,55 @@ class Asteroid(Satellite):
     pass
 
 class Comet(Satellite):
-    # 
+    # Icy body that trails a tail when passing near a star; orbit is usually highly eliptical
     pass
 
 # %% -=- Constructs (Low Priority) -=- %% #
 class Construct(Satellite):
+    # Any non-naturally occuring celestial body in orbit around a star or remnant
     pass
 
 class DysonSwarm(Construct):
+    # Many small satellites around a star, intended to harvest energy
     pass
 
 class DysonSphere(Construct):
+    # A shell constructed around a star intended to harvest energy
     pass
 
 class Topopolis(Construct):
+    # A massive (stellar-scale) habitat construct, like many O'Neil cylinders joined together
     pass
 
-class Ringworld(Construct):
+class NivenRing(Construct):
+    # A stellar scale rotating torroidal habitat
     pass
 
 class BishopRing(Construct):
+    # A planetary scale rotating rorroidal habitat in orbit around a star or remnant
+    pass
+
+class ShellWorld(Construct):
+    # Any of several types of hollow, planet or asteroid scale habitats orbiting a star or remnant
     pass
 
 class OrbitalRing(Construct):
+    # A torroidal habitat encircling (or partly encircling) a planet or moon
     pass
 
 class ONeillCylinder(Construct):
+    # An orbital scale habitat formed from a rotating cylinder
     pass
 
 class SpaceStation(Construct):
+    # Any small-scale habitat in orbit around a planet, moon, asteroid, star, etc...
     pass
 
 # %% -=- Compositions -=- %% #
 class StellarBinary():
+    # A class to contain binary star systems, which have many special properties
     pass
 
 class System():
+    # A generic class for any grouping of objects that together form a stellar system
     pass
