@@ -1,8 +1,9 @@
 class CelestialBody():
     # Any object in space is a celestial body
-    def __init__(self, mass, age):
+    def __init__(self, mass, age, angular):
         self.mass = mass
         self.age = age
+        self.angular = angular
 
 # %% -=- Stellar Objects -=- %% #
 class Star(CelestialBody):
