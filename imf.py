@@ -1,17 +1,21 @@
+"""All masses in M_S.
+
+Use with random.choices.  Minimal working example would be something lile:
+    from random import choices
+    population = np.geomspace(lower, upper, num=1000)
+    weights = KroupaIMF(population)
+    single_value = choices(population, weights)
+    k_values = choices(population, weights, k=100)
+"""
+
 import numpy as np
-import matplotlib.pyplot as plt
-# All masses in M_S
-# Use with random.choices.  Minimal working example would be something lile:
-#  from random import choices
-#  population = np.geomspace(lower, upper, num=1000)
-#  weights = KroupaIMF(population)
-#  single_value = choices(population, weights)
-#  k_values = choices(population, weights, k=100)
 
 
 def KroupaIMF(m):
-    # From Kroupa 2001
-    # A relatively simple IMF, built up of piecewise power laws
+    """From Kroupa 2001.
+
+    A relatively simple IMF, built up of piecewise power laws.
+    """
     cond1 = m < 0.08
     cond2 = (m >= 0.08) & (m < 0.5)
     cond3 = (m >= 0.5) & (m < 1)
@@ -29,9 +33,11 @@ def KroupaIMF(m):
 
 
 def ChabrierIMF(m):
-    # From Chabrier 2003
-    # Somewhat more complex than the Kroupa IMF, made up of both power lawn and log normal pieces
-    #  (gives fewer extremely low / extremely high mass bodies than Kroupa)
+    """From Chabrier 2003.
+
+    Somewhat more complex than the Kroupa IMF, made up of both power lawn and log normal pieces
+    (gives fewer extremely low / extremely high mass bodies than Kroupa).
+    """
     cond1 = m <= 1
     cond2 = (m > 1) & (np.log(m) <= 0.54)
     cond3 = (np.log(m) > 0.54) & (np.log(m) <= 1.26)
@@ -55,18 +61,17 @@ def ChabrierIMF(m):
 #  should be approx. 120 M_S (more massive stars need to gain mass later in life, e.g. through
 #  accretion in a binary).  I'll test out to 250 M_S just to see what I get
 
-def test(lower=0.01, upper=250):
+# def test(lower=0.01, upper=250):
+#     import matplotlib.pyplot as plt
+#     masses = np.geomspace(lower, upper, num=1000)
+#     y_kr = KroupaIMF(masses)
+#     y_ch = ChabrierIMF(masses)
 
-    masses = np.geomspace(lower, upper, num=1000)
-
-    y_kr = KroupaIMF(masses)
-    y_ch = ChabrierIMF(masses)
-
-    plt.plot(masses, y_kr, "r-", label="Kroupa")
-    plt.plot(masses, y_ch, "b-", label="Chabrier")
-    plt.yscale("log")
-    plt.xscale("log")
-    plt.legend()
+#     plt.plot(masses, y_kr, "r-", label="Kroupa")
+#     plt.plot(masses, y_ch, "b-", label="Chabrier")
+#     plt.yscale("log")
+#     plt.xscale("log")
+#     plt.legend()
 
 
-test()
+# test()
