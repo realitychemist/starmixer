@@ -8,11 +8,19 @@ class CelestialBody():
 # %% -=- Stellar Objects -=- %% #
 class Star(CelestialBody):
     # A star is any fusing body sitting near the center of mass of a system
-    pass
+    def __init__(self, mass, age, angular, metallicity):
+        self.metallicity = metallicity
+        super(Star, self).__init__(mass, age, angular)
 
 class MainSequence(Star):
     # Most stars are main sequence stars (this class includes red dwarfs)
-    pass
+    def __init__(self, mass, age, angular, metallicity):
+        super(MainSequence, self).__init__(mass, age, angular, metallicity)
+        temperature = None  # Function of mass/age/metallicity
+        color = None  # Function of temperature
+        radius = None  # Function of mass/age/metallicity
+        luminosity = None  # Function of temperature/radius
+        rotation = None  # Function of angular/mass/radius
 
 class Giant(Star):
     # A star past the main sequence part of its life (or that skipped it)
