@@ -1,25 +1,27 @@
+import blackbody
+
 class CelestialBody():
     # Any object in space is a celestial body
     def __init__(self, mass, age, angular):
-        self.mass = mass
-        self.age = age
-        self.angular = angular
+        self.mass = mass  # m_sol
+        self.age = age  # log(MYR)
+        self.angular = angular  # L_sol (not to be confused with luminosity)
 
 # %% -=- Stellar Objects -=- %% #
 class Star(CelestialBody):
     # A star is any fusing body sitting near the center of mass of a system
     def __init__(self, mass, age, angular, metallicity):
-        self.metallicity = metallicity
+        self.metallicity = metallicity  # Z
         super(Star, self).__init__(mass, age, angular)
 
 class MainSequence(Star):
     # Most stars are main sequence stars (this class includes red dwarfs)
     def __init__(self, mass, age, angular, metallicity):
         super(MainSequence, self).__init__(mass, age, angular, metallicity)
-        temperature = None  # Function of mass/age/metallicity
-        color = None  # Function of temperature
-        radius = None  # Function of mass/age/metallicity
-        luminosity = None  # Function of temperature/radius
+        temperature = (mass**2.5)**-4  # T_sol
+        color = blackbody.color_match(temperature)  # RGB hexadecimal
+        radius = mass**0.5  # r_sol
+        luminosity = mass**3.5  # L_sol (not to be confused with angular momentum)
         rotation = None  # Function of angular/mass/radius
 
 class Giant(Star):
