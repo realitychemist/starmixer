@@ -5,8 +5,11 @@ name = "pypi"
 
 [packages]
 pandas = "*"
+scipy = "*"
+matplotlib = "*"
+pyqt6 = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
