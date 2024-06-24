@@ -5,3 +5,4 @@ BSE/
 .idea/modules.xml
 .idea/starmixer.iml
 .idea/codeStyles/codeStyleConfig.xml
+__pycache__/constants.cpython-312.pyc

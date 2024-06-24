@@ -2,80 +2,88 @@
 
 import numpy as np
 from scipy.integrate import quad
+from itertools import pairwise
+from typing import Sequence
 
 
-class GenericPowerlaw:
-    def __init__(self, gamma: float, a: float, b: float):
+class BrokenPowerLaw:
+    def __init__(self, gammas: Sequence[float], bounds: Sequence[float]) -> None:
+        """A generic broken powerlaw, normalized over the range [bounds[0]:bounds[-1]] to form a valid PDF.
+
+        :param gammas: A sequence of gammas for each section of the power law, in order from low to high inputs.
+        :param bounds: A sequence of bounds and breaks: bounds[0] and bounds[-1] are the limits of integration
+            for notmalizing the function as a PDF, while all other entries denote the locations of the breaks.
+            Should have length len(gammas)+1 and be mSequenceonoSizedtonically increasing.
+        """
+        if not len(gammas) == len(bounds) - 1:
+            raise ValueError(f"len(gammas) must be equal to len(bounds)-1, not len(gammas)={len(gammas)}"
+                             f" and len(bounds)={len(bounds)}")
+        for first, second in pairwise(bounds):  # Check that bounds are monotonically increasing.
+            if first >= second:
+                raise ValueError(f"Bounds must be monotonically increasing, not {bounds}")
+
+        self.gammas = gammas
+        self.bounds = bounds
+
+        # TODO: This does not currently enforce continuity!  Make that happen...
+
+        integrated = 0
+        for g, (l, u) in zip(self.gammas, pairwise(self.bounds)):
+            integrated += quad(lambda x: x**g, a=l, b=u)[0]
+        self.k = 1/integrated
+
+    def __call__(self, m: float) -> float:
+        if m < self.bounds[0] or m > self.bounds[-1]:
+            raise ValueError(f"m must be in the range [{self.bounds[0]}:{self.bounds[-1]}]")
+        gamma_idx = next(i for i, x in enumerate(self.bounds) if x >= m) - 1
+        return m**self.gammas[gamma_idx] * self.k
+
+
+class Powerlaw(BrokenPowerLaw):
+    def __init__(self, gamma: float, a: float, b: float) -> None:
         """A generic powerlaw of the form k*x**gamma, normalized by k over the range [a:b] to form a valid PDF.
 
         :param gamma: The power-law exponent; usually negative in this context.
         :param a: The minimum of the range over which to normalize (a > 0).
-        :param b: The maximum of the range over which to normalize (a < b < inf).
+        :param b: The maximum of the range over which to normalize (a < b).
         """
-        if a <= 0 or b < a or b == np.inf:
+        if a <= 0 or b < a:
             raise ValueError("Invalid bounds of integration.")
-        self.gamma = gamma
-        self.a = a
-        self.b = b
-        integrated = quad(lambda x: x**self.gamma, a=self.a, b=self.b)[0]
-        self.k = 1/integrated
-
-    def __call__(self, m: float) -> float:
-        """Evaluate the power-law IMF for a given input mass.
-
-        :param m: The value at wihch to evaluate the power-law IMF. Must be in the range [a:b] used when constructing.
-        :return: The probability of a particular star being of mass m in this power-law distribution.
-        """
-        if m < self.a or m > self.b:
-            raise ValueError(f"m must be in the range [{self.a}:{self.b}].")
-        return m**self.gamma * self.k
+        super().__init__(gammas=[gamma], bounds=[a, b])
 
 
-class SalpeterIMF:
-    def __init__(self, a, b):
+class SalpeterIMF(Powerlaw):
+    def __init__(self, a, b) -> None:
         """A power-law IMF with a single exponent of -2.35.  Fits well for high-mass stars, but overestimates number
         of low-mass stars in a population.
 
         :param a: The minimum of the range over which to normalize (a > 0).
         :param b: The maximum of the range over which to normalize (a < b < inf).
         """
-        self.gamma = -2.35
-        self.a = a
-        self.b = b
-        self.k = quad(lambda x: x**self.gamma, a=self.a, b=self.b)[0]**-1
-
-    def __call__(self, m: float) -> float:
-        """Evaluate the Salpeter IMF for a given input mass.
-
-        :param m: The value at which to evaluate the Salpeter IMF.  Must be in the range [a:b] used when constructing.
-        :return: The probability of a particular star being of mass in a Salpeter-distributed population.
-        """
-        if m < self.a or m > self.b:
-            raise ValueError(f"m must be in the range [{self.a}:{self.b}].")
-        return m**self.gamma * self.k
+        super().__init__(gamma=-2.35, a=a, b=b)
 
 
-class KroupaIMF:
+class KroupaIMF(BrokenPowerLaw):
     def __init__(self,
-                 gammas: tuple = (-0.3, -1.3, -2.3, -2.3),
-                 b: float = np.inf):
+                 gammas: Sequence[float] = (-0.3, -1.3, -2.3, -2.3),
+                 ub: float = np.inf) -> None:
         """Piecewise power-law IMF as defined in Kroupa 2001.
         :param gammas: The Kroupa IMF is a piecewise combination of four power-laws, with boundaries at 0.01 (minimum
             valid mass), 0.08, 0.5, and 1 m_sol. Kroupa 2001 estimates the gamma values for each piece to be
             (respectively) -0.3, -1.3, -2.3, and -2.3, but there is an uncertainty associated with each estimate.
-            This parameter lets you manually set the gamma values for each piece, by passing a 4-tuple of floats.
+            This parameter lets you manually set the gamma values for each piece, by passing a sequence of floats.
             The default behavior is to use the mean values from Kroupa 2001.
-        :param b: Kroupa 2001 does not specify an explicit upper bound on mass, so the default behavior is to use an
+        :param ub: Kroupa 2001 does not specify an explicit upper bound on mass, so the default behavior is to use an
             infinite upper bound.  However this parameter can be used to explicitly specify a finite upper bound.
         """
-        cutoffs = (0.01, 0.08, 0.5, 1)
-        self.gammas = gammas
-        self.b = b
-        # TODO: https://gist.github.com/cgobat/12595d4e242576d4d84b1b682476317d
+        if not len(gammas) == 4:
+            raise ValueError(f"KroupaIMF requires exactly 4 gammas, not {len(gammas)}.")
+        bounds = [0.01, 0.08, 0.5, 1, ub]
+        super().__init__(gammas=gammas, bounds=bounds)
 
 
 class ChabrierIMF:
-    def __init__(self):
+    def __init__(self) -> None:
         """IMF based on Chabrier 2003, made up of piecewise power-law and log-normal sections.  Compared with
         KroupaIMF, this gives fewer extremely low- and extremely high-mass bodier.
         """
@@ -109,12 +117,12 @@ class ChabrierIMF:
 if __name__ == "__main__":
     # Lowest-mass brown dwarfs are ~ 0.01 m_sol == 13 m_jptr
     # Highest-mass star currently known is ~ 250 m_sol, but max expected at time of formation was ~ 150 m_sol
-    imf = SalpeterIMF(0.01, 150)
+    imf = KroupaIMF(ub=150)
     masses = np.geomspace(0.01, 150, 1000)
     ps = [imf(m) for m in masses]
 
     # noinspection PyTypeChecker
-    assert np.isclose(quad(imf, 0.01, 150)[0], 1)
+    assert np.isclose(quad(imf, 0.01, 150, limit=200)[0], 1)
 
     bounds_check_passed = False
     try:
@@ -128,7 +136,7 @@ if __name__ == "__main__":
     plt.plot(masses, ps, "w")
     plt.yscale("log")
     plt.xscale("log")
-    plt.title("Power-Law IMF (γ=-2.35, a.k.a. Salpeter)")
+    plt.title("Power-Law IMF (Kroupa)")
     plt.xlabel("Mass :: m_sol")
     plt.ylabel("Probability Density")
     plt.show()
