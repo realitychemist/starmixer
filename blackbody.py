@@ -66,6 +66,63 @@ def spectrum(t_eff: float,
     return df
 
 
+def wavelength_to_rgba(w: float) -> tuple[float, float, float, float]:
+    """Convert wavelength (in nm) to an RGBA color. Outside the visible range, colors keep their RBG
+    values and fall off in alpha toward 20% over a range of 50 nm.
+
+    :param w: The wavelength, in nanometers.
+    :return: The RGB color, as a tuple (values for each component range from 0 to 1).
+    """
+    if 330 <= w <= 380:
+        r = 0.3**0.8
+        g = 0
+        b = 0.3**0.8
+        x = (w-330)/50
+        a = 0.8*(6*x**5 - 15*x**4 + 10*x**3)+0.2
+    elif 380 <= w <= 440:  # Indigos / violets
+        x = 0.3 + 0.7*(w-380) / (440-380)
+        r = ((-(w-440) / (440-380)) * x)**0.8
+        g = 0
+        b = x**0.8
+        a = 1
+    elif 440 <= w <= 490:  # Blues
+        r = 0
+        g = ((w-440) / (490-440))**0.8
+        b = 1
+        a = 1
+    elif 490 <= w <= 510:  # Greens
+        r = 0
+        g = 1
+        b = (-(w-510)/(510-490))**0.8
+        a = 1
+    elif 510 <= w <= 580:  # Yellows
+        r = ((w-510) / (580-510))**0.8
+        g = 1
+        b = 0
+        a = 1
+    elif 580 <= w <= 645:  # Oranges
+        r = 1
+        g = (-(w-645) / (645-580))**0.8
+        b = 0
+        a = 1
+    elif 645 <= w <= 750:  # Reds
+        x = 0.3 + 0.7*(750-w) / (750-645)
+        r = x**0.8
+        g = 0
+        b = 0
+        a = 1
+    elif 750 <= w <= 800:
+        r = 0.3**0.8
+        g = 0
+        b = 0
+        x = (-1*w + 800) / 50
+        a = 0.8*(6*x**5 - 15*x**4 + 10*x**3)+0.2
+    else:  # Error state, defualt to hot pink (non-spectral)
+        r, g, b, a = 255, 0, 155, 1
+
+    return r, g, b, a
+
+
 def spectrum_plot(t_eff: float, maxwav: float or None = None) -> plt.figure:
     """Automatic pretty-plotting for the spectrum of a blackbody. Visible range is color-coded (with alpha-falloff
     outside visible range), the peak wavelength is labeled, and a patch shows the overall color of the blackbody.
@@ -79,59 +136,19 @@ def spectrum_plot(t_eff: float, maxwav: float or None = None) -> plt.figure:
     spect = spectrum(t_eff, maxwav)
     overall_color = visible_color(t_eff)
 
-    def wavelength_to_rgba(w: float) -> tuple[float, float, float]:
-        """Convert wavelength (in nm) to an RGBA color. Wavelengths outside the visible spectrum keep the color of
-        that end (so either red or violet), but fall off toward an alpha of 0 over 50 nm.
-
-        :param w: The wavelength, in nanometers.
-        :return: The RGB color, as a tuple (values for each component range from 0 to 1).
-        """
-        if 380 <= w <= 440:  # Indigos / violets
-            x = 0.3 + 0.7*(w-380) / (440-380)
-            r = ((-(w-440) / (440-380)) * x)**0.8
-            g = 0
-            b = x**0.8
-        elif 440 <= w <= 490:  # Blues
-            r = 0
-            g = ((w-440) / (490-440))**0.8
-            b = 1
-        elif 490 <= w <= 510:  # Greens
-            r = 0
-            g = 1
-            b = (-(w-510)/(510-490))**0.8
-        elif 510 <= w <= 580:  # Yellows
-            r = ((w-510) / (580-510))**0.8
-            g = 1
-            b = 0
-        elif 580 <= w <= 645:  # Oranges
-            r = 1
-            g = (-(w-645) / (645-580))**0.8
-            b = 0
-        elif 645 <= w <= 750:  # Reds
-            x = 0.3 + 0.7*(750-w) / (750-645)
-            r = x**0.8
-            g = 0
-            b = 0
-        else:  # Error state, defualt black
-            r, g, b = 0, 0, 0
-
-        return r, g, b
-
     with plt.style.context("dark_background"):
-        norm = plt.Normalize(380, 750, clip=False)
-        wls = np.arange(380, 751, 2)
+        norm = plt.Normalize(330, 800, clip=True)
+        wls = np.arange(330, 801, 1)
         colors = list(zip(norm(wls), [wavelength_to_rgba(w) for w in wls]))
         spectral_map = matplotlib.colors.LinearSegmentedColormap.from_list("spectral_map", colors)
-        spectral_map.set_extremes(under=(0.3**0.8, 0, 0.3**0.8, 0.33), over=(0.3**0.8, 0, 0, 0.33))
 
         ymax = np.max(spect["Irradiance"]) * 1.1
-        ys = np.linspace(0, ymax, 10)
         extent = (np.min(spect["Wavelength"]), np.max(spect["Wavelength"]),
                   np.min(spect["Irradiance"]), ymax)
 
         fig, ax = plt.subplots()
         ax.imshow(np.array(spect["Wavelength"]).reshape(1, len(spect["Wavelength"])),
-                  clim=(380, 750), extent=extent, cmap=spectral_map, aspect="auto", alpha=None)
+                  clim=(330, 800), extent=extent, cmap=spectral_map, aspect="auto", alpha=None)
         ax.set_ylim(0, ymax)
         ax.plot("Wavelength", "Irradiance", data=spect, linewidth=2, color="white")
         ax.fill_between(spect["Wavelength"], spect["Irradiance"], ymax, color="black")
